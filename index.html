@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bloxd.io Username Checker & Generator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #1a1a24;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .card {
+            background-color: #262636;
+            border-radius: 12px;
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            border: 1px solid #36364d;
+        }
+
+        h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #7289da;
+            text-align: center;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px 15px;
+            border-radius: 6px;
+            border: 1px solid #36364d;
+            background-color: #1a1a24;
+            color: #ffffff;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: #7289da;
+        }
+
+        button {
+            padding: 12px 18px;
+            background-color: #7289da;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #5b6eae;
+        }
+
+        .btn-gen {
+            background-color: #43b581;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .btn-gen:hover {
+            background-color: #3ca374;
+        }
+
+        .result {
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .result.valid {
+            display: block;
+            background-color: rgba(46, 204, 113, 0.15);
+            color: #2ecc71;
+            border: 1px solid #2ecc71;
+        }
+
+        .result.invalid {
+            display: block;
+            background-color: rgba(231, 76, 60, 0.15);
+            color: #e74c3c;
+            border: 1px solid #e74c3c;
+        }
+
+        .generated-box {
+            display: none;
+            background-color: #1a1a24;
+            border: 1px solid #36364d;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+
+        .generated-box.active {
+            display: block;
+        }
+
+        .generated-title {
+            font-size: 14px;
+            color: #a0a0b0;
+            margin-bottom: 10px;
+        }
+
+        .username-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            background-color: #36364d;
+            color: #7289da;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .tag:hover {
+            background-color: #7289da;
+            color: white;
+        }
+
+        .rules {
+            font-size: 13px;
+            color: #a0a0b0;
+            line-height: 1.6;
+        }
+
+        .rules ul {
+            margin: 5px 0 0 0;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Bloxd.io Username Tool</h2>
+    
+    <div class="input-group">
+        <input type="text" id="usernameInput" placeholder="Enter username..." maxlength="30">
+        <button onclick="checkUsername()">Check</button>
+    </div>
+
+    <button class="btn-gen" onclick="generateUsernames()">Generate 10 Unique Usernames</button>
+
+    <div id="resultBox" class="result"></div>
+
+    <div id="generatedBox" class="generated-box">
+        <div class="generated-title">Click a suggestion to copy to input:</div>
+        <div id="tagsContainer" class="username-tags"></div>
+    </div>
+
+    <div class="rules">
+        <strong>Standard Format Rules:</strong>
+        <ul>
+            <li>Length between 4 and 20 characters</li>
+            <li>Contains only letters, numbers, and underscores</li>
+            <li>No spaces or special symbols</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    const words = ["Vortex", "Shadow", "Pixel", "Nova", "Cipher", "Aether", "Echo", "Frost", "Quantum", "Solar", "Neon", "Blaze", "Titan", "Zenith", "Pulse"];
+    const phrases = ["SpeedyRun", "BlockDash", "IronClad", "NightWatch", "SkyBound", "SwiftStrike", "EpicGamer", "ProBuilder", "VoidWalker"];
+    const abbreviations = ["AFK", "MVP", "GG", "FPS", "PvP", "XP", "DEV", "OG", "EZ", "PRO"];
+
+    function checkUsername() {
+        const username = document.getElementById('usernameInput').value.trim();
+        const resultBox = document.getElementById('resultBox');
+        
+        const usernameRegex = /^[a-zA-Z0-9_]{4,20}$/;
+
+        if (!username) {
+            resultBox.className = 'result invalid';
+            resultBox.textContent = 'Please enter a username to check.';
+            return;
+        }
+
+        if (usernameRegex.test(username)) {
+            resultBox.className = 'result valid';
+            resultBox.innerHTML = `<strong>Valid Format!</strong> "${username}" fits standard username requirements.`;
+        } else {
+            resultBox.className = 'result invalid';
+            resultBox.innerHTML = `<strong>Invalid Format.</strong> Must be 4–20 characters long and contain only letters, numbers, or underscores.`;
+        }
+    }
+
+    function generateUsernames() {
+        const suggestions = new Set(); // Use a Set to ensure all 10 are unique
+
+        while (suggestions.size < 10) {
+            const randomNum = Math.floor(Math.random() * 8999 + 1000);
+            const word = words[Math.floor(Math.random() * words.length)];
+            const phrase = phrases[Math.floor(Math.random() * phrases.length)];
+            const abbr = abbreviations[Math.floor(Math.random() * abbreviations.length)];
+
+            const patterns = [
+                `${word}_${abbr}`,
+                `${abbr}_${word}`,
+                `${phrase}${randomNum}`,
+                `${word}${randomNum}`,
+                `${abbr}_${phrase}`,
+                `${word}_${phrase}`,
+                `${abbr}${randomNum}`
+            ];
+
+            const chosen = patterns[Math.floor(Math.random() * patterns.length)];
+            
+            // Ensure it fits the 4-20 character rule
+            if (chosen.length >= 4 && chosen.length <= 20) {
+                suggestions.add(chosen);
+            }
+        }
+
+        const tagsContainer = document.getElementById('tagsContainer');
+        tagsContainer.innerHTML = '';
+
+        suggestions.forEach(name => {
+            const tag = document.createElement('span');
+            tag.className = 'tag';
+            tag.textContent = name;
+            tag.onclick = () => {
+                document.getElementById('usernameInput').value = name;
+                checkUsername();
+            };
+            tagsContainer.appendChild(tag);
+        });
+
+        document.getElementById('generatedBox').classList.add('active');
+    }
+
+    document.getElementById('usernameInput').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            checkUsername();
+        }
+    });
+</script>
+
+</body>
+</html>
